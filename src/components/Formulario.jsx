@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Error from "./Error";
 
-const Formulario = ({setPacientes, paciente, pacientes}) => {
+const Formulario = ({setPacientes, paciente, pacientes, setPaciente}) => {
   const [nombre, setNombre] = useState('');
   const [propietario, setPropietario] = useState('');
   const [email, setEmail] = useState('');
@@ -11,7 +11,13 @@ const Formulario = ({setPacientes, paciente, pacientes}) => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    
+    if(Object.keys(paciente).length > 0){
+      setNombre(paciente.nombre);
+      setPropietario(paciente.propietario);
+      setEmail(paciente.email);
+      setFecha(paciente.fecha);
+      setSintomas(paciente.sintomas);
+    }
   }, [paciente])
   
 
@@ -39,14 +45,26 @@ const Formulario = ({setPacientes, paciente, pacientes}) => {
       propietario, 
       email, 
       fecha, 
-      sintomas,
-      id: generarId()
+      sintomas
     }
 
-    setPacientes([
+    if(paciente.id) {
+      //Editando
+      objetoPaciente.id = paciente.id;
+      const pacientesActualizados = pacientes.map(pacienteState => pacienteState.id === paciente.id ? objetoPaciente : pacienteState);
+
+      setPacientes(pacientesActualizados);
+      setPaciente({});
+    } else {
+      //Nuevo registro
+      objetoPaciente.id = generarId();
+      setPacientes([
       ...pacientes,
       objetoPaciente
     ]);
+    }
+
+    
 
     //Reiniciar el formulario
     setNombre('');
@@ -123,7 +141,7 @@ const Formulario = ({setPacientes, paciente, pacientes}) => {
             />
           </div>
 
-          <input type="submit" className="bg-indigo-600 w-full text-white p-3 font-bold uppercase hover:bg-indigo-700 cursor-pointer transition-all" value='Agregar Paciente'/>
+          <input type="submit" className="bg-indigo-600 w-full text-white p-3 font-bold uppercase hover:bg-indigo-700 cursor-pointer transition-all" value={paciente.id ? 'Editar paciente' : 'Agregar paciente'}/>
         </form>
     </div>
   )
